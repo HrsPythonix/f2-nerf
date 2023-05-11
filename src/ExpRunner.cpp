@@ -41,6 +41,20 @@ ExpRunner::ExpRunner(const std::string& conf_path) {
   var_loss_weight_ = config["train"]["var_loss_weight"].as<float>();
   var_loss_start_ = config["train"]["var_loss_start"].as<int>();
   var_loss_end_ = config["train"]["var_loss_end"].as<int>();
+  try
+  {
+    use_l2_loss_ = config["train"]["use_l2_loss"].as<bool>();
+    if(use_l2_loss_)
+    {
+      std::cout << "Use l2_loss!" << std::endl;
+    }else{
+      std::cout << "Use l1_loss!" << std::endl;
+    }
+  }catch(...)
+  {
+    use_l2_loss_ = false;
+    std::cout << "No use_l2_loss, default as false!" << std::endl;
+  }
 
   // Dataset
   dataset_ = std::make_unique<Dataset>(global_data_pool_.get());

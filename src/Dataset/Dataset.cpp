@@ -104,7 +104,7 @@ Dataset::Dataset(GlobalDataPool* global_data_pool) {
   }
   catch (...) {
     for (int i = 0; i < n_images_; i++) {
-      if (i % 8 == 0) test_set_.push_back(i);
+      if (i % 10 == 0) test_set_.push_back(i);
       else train_set_.push_back(i);
     }
   }
