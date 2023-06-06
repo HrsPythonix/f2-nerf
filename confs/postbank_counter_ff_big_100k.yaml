@@ -7,9 +7,9 @@ defaults:
   - shader: sh_shader
   - _self_
 
-dataset_name: hac_shop
-case_name: 20230310_shop_ip12_stb_1000_wdepth
-exp_name: 1080p_100k_20ts_l2
+dataset_name: postbank
+case_name: postbank_counter_ff_a7s3_4k_800
+exp_name: 1080p_100k_20ts_l1
 
 is_continue: false
 
@@ -28,10 +28,9 @@ pts_sampler:
   scale_by_dis: true
 
 dataset:
-  factor: 1
+  factor: 2
   bounds_factor: [ 0.5, 4.0 ]
 
 train:
   ray_march_init_fineness: 16
-  loss_function: l2
 

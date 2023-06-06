@@ -76,7 +76,7 @@ Dataset::Dataset(GlobalDataPool* global_data_pool) {
   bounds_.clamp_(1e-2f, 1e9f);
 
   global_data_pool_->near_ = bounds_.min().item<float>();
-  std::vector<Tensor> images;
+  // std::vector<Tensor> images;
   // Load images
   {
     ScopeWatch watch("LoadImages");
@@ -84,7 +84,11 @@ Dataset::Dataset(GlobalDataPool* global_data_pool) {
     for (int i = 0; i < n_images_; i++) {
       std::string image_path;
       std::getline(image_list, image_path);
-      images.push_back(Utils::ReadImageTensor(image_path).to(torch::kCPU));
+      Tensor image = Utils::ReadImageTensor(image_path).to(torch::kCPU);
+      if (i == 0){
+        image_tensors_ = torch::empty({n_images_, image.size(0), image.size(1), image.size(2) }, CPUFloat);
+      }
+      image_tensors_[i] = image;
     }
   }
 
@@ -119,9 +123,9 @@ Dataset::Dataset(GlobalDataPool* global_data_pool) {
   bounds_train_ = bounds_.index({train_idx_ts}).contiguous();
 
   // Prepare training images
-  height_ = images[0].size(0);
-  width_  = images[0].size(1);
-  image_tensors_ = torch::stack(images, 0).contiguous();
+  height_ = image_tensors_[0].size(0);
+  width_  = image_tensors_[0].size(1);
+  image_tensors_ = image_tensors_.contiguous();
 }
 
 void Dataset::NormalizeScene() {

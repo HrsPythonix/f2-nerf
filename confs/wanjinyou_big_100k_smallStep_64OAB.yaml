@@ -9,7 +9,7 @@ defaults:
 
 dataset_name: hac_shop
 case_name: 20230310_shop_ip12_stb_1000_wdepth
-exp_name: 1080p_100k_20ts_l2
+exp_name: 1080p_100k_20ts_l1_smallStep_64OAB
 
 is_continue: false
 
@@ -26,12 +26,12 @@ pts_sampler:
   split_dist_thres: 1.5
   near: 0.01
   scale_by_dis: true
+  sample_l: 1.953125e-3   # 1. / 512.
 
 dataset:
   factor: 1
   bounds_factor: [ 0.5, 4.0 ]
 
 train:
-  ray_march_init_fineness: 16
-  loss_function: l2
+  ray_march_init_fineness: 4
 

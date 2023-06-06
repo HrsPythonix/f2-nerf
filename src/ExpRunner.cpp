@@ -41,19 +41,34 @@ ExpRunner::ExpRunner(const std::string& conf_path) {
   var_loss_weight_ = config["train"]["var_loss_weight"].as<float>();
   var_loss_start_ = config["train"]["var_loss_start"].as<int>();
   var_loss_end_ = config["train"]["var_loss_end"].as<int>();
+
   try
   {
-    use_l2_loss_ = config["train"]["use_l2_loss"].as<bool>();
-    if(use_l2_loss_)
+    std::string loss_function_name = config["train"]["loss_function"].as<std::string>();
+    if(loss_function_name == std::string("l1"))
     {
-      std::cout << "Use l2_loss!" << std::endl;
-    }else{
       std::cout << "Use l1_loss!" << std::endl;
+      loss_type_ = loss_type::l1_loss;
+    }else if(loss_function_name == std::string("l2")){
+      std::cout << "Use l2_loss!" << std::endl;
+      loss_type_ = loss_type::l2_loss;
+    }else if(loss_function_name == std::string("torch_l1")){
+      std::cout << "Use torch l1_loss!" << std::endl;
+      loss_type_ = loss_type::torch_l1;
+    }else if(loss_function_name == std::string("torch_l2")){
+      std::cout << "Use torch l2_loss!" << std::endl;
+      loss_type_ = loss_type::torch_l2;
+    }else if(loss_function_name == std::string("torch_smoothed_l1")){
+      std::cout << "Use torch smoothed l1_loss!" << std::endl;
+      loss_type_ = loss_type::torch_smoothed_l1;
+    }else{
+      std::cout << "Use default l1_loss!" << std::endl;
+      loss_type_ = loss_type::l1_loss;
     }
   }catch(...)
   {
-    use_l2_loss_ = false;
-    std::cout << "No use_l2_loss, default as false!" << std::endl;
+    std::cout << "Use default l1_loss!" << std::endl;
+    loss_type_ = loss_type::l1_loss;;
   }
 
   // Dataset
@@ -105,7 +120,28 @@ void ExpRunner::Train() {
       auto render_result = renderer_->Render(rays_o, rays_d, bounds, emb_idx);
       Tensor pred_colors = render_result.colors.index({Slc(0, cur_batch_size)});
       Tensor disparity = render_result.disparity;
-      Tensor color_loss = torch::sqrt((pred_colors - gt_colors).square() + 1e-4f).mean();
+      Tensor color_loss;
+
+      switch(loss_type_){
+        case loss_type::l1_loss:
+          color_loss = torch::sqrt((pred_colors - gt_colors).square() + 1e-4f).mean();
+          break;
+        case loss_type::l2_loss:
+          color_loss = (pred_colors - gt_colors).square().mean();
+          break;
+        case loss_type::torch_l1:
+          color_loss = torch::nn::functional::l1_loss(pred_colors, gt_colors);
+          break;
+        case loss_type::torch_l2:
+          color_loss = torch::nn::functional::mse_loss(pred_colors, gt_colors);
+          break;
+        case loss_type::torch_smoothed_l1:
+          color_loss = torch::nn::functional::smooth_l1_loss(pred_colors, gt_colors);
+          break;
+        default:
+          std::cout << "invalid loss type, fall to default l1 loss" << std::endl;
+          color_loss = torch::sqrt((pred_colors - gt_colors).square() + 1e-4f).mean();
+      }
 
       Tensor disparity_loss = disparity.square().mean();
 

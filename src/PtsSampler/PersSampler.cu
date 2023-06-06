@@ -12,7 +12,7 @@
 #define ABS_WEIGHT_THRES 0.01
 #define REL_WEIGHT_THRES 0.1
 
-#define OCC_ALPHA_BASE 32
+#define OCC_ALPHA_BASE 64
 #define ABS_ALPHA_THRES 0.02
 #define REL_ALPHA_THRES 0.1
 

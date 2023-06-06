@@ -1,5 +1,5 @@
 defaults:
-  - train: 100k
+  - train: 300k
   - dataset: default
   - renderer: default
   - pts_sampler: perspective
@@ -9,7 +9,7 @@ defaults:
 
 dataset_name: hac_shop
 case_name: 20230310_shop_ip12_stb_1000_wdepth
-exp_name: 1080p_100k_20ts_l2
+exp_name: 1080p_300k_20ts_l2
 
 is_continue: false
 
